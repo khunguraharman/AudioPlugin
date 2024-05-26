@@ -183,6 +183,14 @@ void AudioPluginAudioProcessor::setStateInformation (const void* data, int sizeI
     // whose contents will have been created by the getStateInformation() call.
 }
 
+juce::AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createParameterLayout() {
+    juce::AudioProcessorValueTreeState::ParameterLayout layout;
+    layout.add(std::make_unique<juce::AudioParameterFloat>("LowCutOff Frequency", "LowCutOff Frequency", juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 1.0f, 20.0f)));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("HighCutOff Frequency", "HighCutOff Frequency", juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 1.0f, 20000.0f)));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Peak Frequency", "Peak Frequency", juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 1.0f, 750.0f)));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Peak Gain", "Peak Gain", juce::NormalisableRange<float>(-24.0f, 24.0f, 0.5f, 1.0f, 0.0f)));
+}
+
 //==============================================================================
 // This creates new instances of the plugin..
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
