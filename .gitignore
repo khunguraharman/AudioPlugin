@@ -1,3 +1,7 @@
+**/Builds
+**/JuceLibrarycode
+**/.DS_Store
+
 .vs/
 bin/
 obj/
