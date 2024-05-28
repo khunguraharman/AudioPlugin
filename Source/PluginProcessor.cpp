@@ -185,10 +185,15 @@ void AudioPluginAudioProcessor::setStateInformation (const void* data, int sizeI
 
 juce::AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createParameterLayout() {
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
-    layout.add(std::make_unique<juce::AudioParameterFloat>("LowCutOff Frequency", "LowCutOff Frequency", juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 1.0f, 20.0f)));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("HighCutOff Frequency", "HighCutOff Frequency", juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 1.0f, 20000.0f)));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("Peak Frequency", "Peak Frequency", juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 1.0f, 750.0f)));
-    layout.add(std::make_unique<juce::AudioParameterFloat>("Peak Gain", "Peak Gain", juce::NormalisableRange<float>(-24.0f, 24.0f, 0.5f, 1.0f, 0.0f)));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("LowCutOff Frequency", "LowCutOff Frequency", juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 1.0f), 20.0f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("HighCutOff Frequency", "HighCutOff Frequency", juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 1.0f), 20000.0f));
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Peak Frequency", "Peak Frequency", juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 1.0f), 750.0f));
+    //expressed in decibels
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Peak Gain", "Peak Gain", juce::NormalisableRange<float>(-24.0f, 24.0f, 0.5f, 1.0f), 0.0f));
+
+    layout.add(std::make_unique<juce::AudioParameterFloat>("Peak Quality", "Peak Quality", juce::NormalisableRange<float>(0.1f, 10.0f, 0.05f, 1.0f), 1.0f));
+
+    return layout;
 }
 
 //==============================================================================
