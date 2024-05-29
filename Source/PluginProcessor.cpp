@@ -95,6 +95,8 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+
+    juce::dsp::ProcessSpec spec;
 }
 
 void AudioPluginAudioProcessor::releaseResources()
