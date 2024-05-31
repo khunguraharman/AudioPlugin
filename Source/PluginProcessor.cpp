@@ -205,7 +205,8 @@ void AudioPluginAudioProcessor::setStateInformation (const void* data, int sizeI
 }
 
 ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts) {
-
+    apvts.getRawParameterValue("LowCutOff Frequency")->load();
+    apvts.getRawParameterValue("HighCutOff Frequency")->load();
 
 }
 
