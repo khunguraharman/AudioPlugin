@@ -204,6 +204,11 @@ void AudioPluginAudioProcessor::setStateInformation (const void* data, int sizeI
     // whose contents will have been created by the getStateInformation() call.
 }
 
+ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts) {
+
+
+}
+
 juce::AudioProcessorValueTreeState::ParameterLayout AudioPluginAudioProcessor::createParameterLayout() {
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
     layout.add(std::make_unique<juce::AudioParameterFloat>("LowCutOff Frequency", "LowCutOff Frequency", juce::NormalisableRange<float>(20.0f, 20000.0f, 1.0f, 1.0f), 20.0f));
