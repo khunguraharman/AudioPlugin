@@ -110,6 +110,29 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 
     *leftChain.get<ChainPositions::Peak>().coefficients = *peakCoefficents;
     *rightChain.get<ChainPositions::Peak>().coefficients = *peakCoefficents;
+
+    //need an order of 8 if you have a slope of 3
+    auto cutCoefficients = juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod(chainSettings.lowCutFreq, sampleRate, 2*(chainSettings.lowCutSlope+1));
+
+    auto& leftLowCut = leftChain.get<ChainPositions::Lowcut>();
+
+    leftLowCut.setBypassed<0>(true);
+    leftLowCut.setBypassed<1>(true);
+    leftLowCut.setBypassed<2>(true);
+    leftLowCut.setBypassed<3>(true);
+
+    switch (chainSettings.lowCutSlope)
+    {
+        case Slope_12:
+            *leftLowCut.get<0>().coefficients = *cutCoefficients[0];
+            break;
+        case Slope_24:
+            break;
+        case Slope_36:
+            break;
+        case Slope_48:
+            break;
+    }
 }
 
 void AudioPluginAudioProcessor::releaseResources()
@@ -225,8 +248,8 @@ ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts) {
     settings.peakFreq = apvts.getRawParameterValue("Peak Frequency")->load();
     settings.peakGainInDecibels = apvts.getRawParameterValue("Peak Gain")->load();
     settings.peakQuality = apvts.getRawParameterValue("Peak Quality")->load();
-    settings.lowCutSlope = apvts.getRawParameterValue("LowCut Slope")->load();
-    settings.highCutSlope = apvts.getRawParameterValue("HighCut Slope")->load();
+    settings.lowCutSlope = static_cast<Slope>(apvts.getRawParameterValue("LowCut Slope")->load());
+    settings.highCutSlope = static_cast<Slope>(apvts.getRawParameterValue("HighCut Slope")->load());
     
     return settings;
 }
