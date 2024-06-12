@@ -88,6 +88,14 @@ private:
         Peak,
         HighCut
     };
+
+    void updatePeakFilter(const ChainSettings& chainSettings);
+    
+    using FilterCoefficients = Filter::CoefficientsPtr; //infer by referencing the auto in PluginProcessor.cpp
+    //using FilterCoefficients = juce::dsp::IIR::Coefficients<float>::Ptr
+
+    static void updateCoefficients(FilterCoefficients& old, const FilterCoefficients& replacements);    
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
 };
