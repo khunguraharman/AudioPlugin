@@ -11,17 +11,23 @@
 
 
 //==============================================================================
-AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p)
-{
+AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor(AudioPluginAudioProcessor& p)
+    : AudioProcessorEditor(&p), audioProcessor(p),
+    peakFreqSliderAttachment(audioProcessor.apvts, "Peak Frequency", peakFreqSlider),
+    peakGainSliderAttachment(audioProcessor.apvts, "Peak Gain", peakGainSlider),
+    peakQualitySliderAttachment(audioProcessor.apvts, "Peak Quality", peakQualitySlider),
+    lowCutFreqSliderAttachment(audioProcessor.apvts, "LowCutOff Frequency", lowCutSlopeSlider),
+    highCutFreqSliderAttachment(audioProcessor.apvts, "HighCutOff Frequency", highCutFreqSlider),
+    lowCutSlopeSliderAttachment(audioProcessor.apvts, "LowCut Slope", lowCutFreqSlider),
+    highCutSlopeSliderAttachment(audioProcessor.apvts, "HighCut Slope", highCutSlopeSlider)
+
+{    
     // Make sure that before the constructor has finished, you've set the
-    // editor's size to whatever you need it to be.
-    //std::cout << getComps().size() << std::endl;
+    // editor's size to whatever you need it to be.    
 
     for (auto* comp : getComps())
     {
-        addAndMakeVisible(comp);
-        //std::cout << "Found a comp" << std::endl;
+        addAndMakeVisible(comp);        
     }
     setSize (600, 400);
 }
