@@ -27,6 +27,19 @@ struct ChainSettings
 };
 
 ChainSettings getChainSettings(juce::AudioProcessorValueTreeState& apvts);
+
+using Filter = juce::dsp::IIR::Filter<float>;
+
+using CutFilter = juce::dsp::ProcessorChain<Filter, Filter, Filter, Filter>;
+//will nead two instances of this processor chain if you want to do stereo processing
+using MonoChain = juce::dsp::ProcessorChain<CutFilter, Filter, CutFilter>;
+
+enum ChainPositions
+{
+    Lowcut,
+    Peak,
+    HighCut
+};
 //==============================================================================
 /**
 */
@@ -73,21 +86,9 @@ public:
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     juce::AudioProcessorValueTreeState apvts{ *this, nullptr, "Parameters", createParameterLayout() };
 
-private:
-    using Filter = juce::dsp::IIR::Filter<float>;
-
-    using CutFilter = juce::dsp::ProcessorChain<Filter, Filter, Filter, Filter>;
-    //will nead two instances of this processor chain if you want to do stereo processing
-    using MonoChain = juce::dsp::ProcessorChain<CutFilter, Filter, CutFilter>;
+private:   
 
     MonoChain leftChain, rightChain;
-
-    enum ChainPositions
-    {
-        Lowcut,
-        Peak,
-        HighCut
-    };
 
     void updatePeakFilter(const ChainSettings& chainSettings);
     

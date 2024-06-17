@@ -39,12 +39,98 @@ AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor()
 //==============================================================================
 void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+    using namespace juce;
 
-    g.setColour (juce::Colours::white);
-    g.setFont (15.0f);
-    g.drawFittedText ("Welcome to Harman's Audio Plugin", getLocalBounds(), juce::Justification::centred, 1);
+    // (Our component is opaque, so we must completely fill the background with a solid colour)
+    
+    g.fillAll(Colours::black);
+
+    auto bounds = getLocalBounds();
+
+    auto responseArea = bounds.removeFromTop(bounds.getHeight() * 0.33);
+
+    auto w = responseArea.getWidth();
+
+    auto& lowcut = monoChain.get<ChainPositions::Lowcut>();
+    auto& peak = monoChain.get<ChainPositions::Peak>();
+    auto& highcut = monoChain.get<ChainPositions::HighCut>();
+
+    auto sampleRate = audioProcessor.getSampleRate();
+
+    std::vector<double> mags; //magnitudes
+
+    //we will be calculating one magnitude per pixel and then compute the magnitude at that frequency
+    mags.resize(w);
+    //will use a special helper function to get the frequency that corresponds to a certain pixel
+
+    //mags are expressed in gain units, which are multiplicitive
+    for (int i = 0; i < w; i++) 
+    {
+        double mag = 1.0f;
+
+        //calculate the frequency(x-axis value) that corresponds to the pixel
+        auto freq = mapToLog10(double(i) / double(w), 20.0, 20000.0);
+
+        if(!monoChain.isBypassed<ChainPositions::Peak>())
+            mag *= peak.coefficients->getMagnitudeForFrequency(freq, sampleRate);
+
+        if(!lowcut.isBypassed<0>())
+            mag *= lowcut.get<0>().coefficients->getMagnitudeForFrequency(freq, sampleRate);
+
+        if(!lowcut.isBypassed<1>())
+            mag *= lowcut.get<1>().coefficients->getMagnitudeForFrequency(freq, sampleRate);
+        
+        if (!lowcut.isBypassed<2>())
+            mag *= lowcut.get<2>().coefficients->getMagnitudeForFrequency(freq, sampleRate);
+
+        if (!lowcut.isBypassed<3>())
+            mag *= lowcut.get<3>().coefficients->getMagnitudeForFrequency(freq, sampleRate);
+
+        if (!highcut.isBypassed<0>())
+            mag *= lowcut.get<0>().coefficients->getMagnitudeForFrequency(freq, sampleRate);
+
+        if (!highcut.isBypassed<1>())
+            mag *= lowcut.get<1>().coefficients->getMagnitudeForFrequency(freq, sampleRate);
+
+        if (!highcut.isBypassed<2>())
+            mag *= lowcut.get<2>().coefficients->getMagnitudeForFrequency(freq, sampleRate);
+
+        if (!highcut.isBypassed<3>())
+            mag *= lowcut.get<3>().coefficients->getMagnitudeForFrequency(freq, sampleRate);
+
+        mags[i] = Decibels::gainToDecibels(mag);
+    }
+
+    Path responseCurve;
+
+    const double outputMin = responseArea.getBottom();
+    const double outputMax = responseArea.getY();
+
+    std::cout << outputMin << std::endl;
+    std::cout << outputMax << std::endl;
+
+    //lambda expression
+    auto map = [outputMin, outputMax](double input)
+    {
+        //the gain ranges from -24 to +24
+        return jmap(input, -24.0, 24.0, outputMin, outputMax);
+    };
+
+    responseCurve.startNewSubPath(responseArea.getX(), map(mags.front()));
+
+    for (size_t i = 1; i < mags.size(); i++)
+    {
+        //providing x & y coordinates
+        responseCurve.lineTo(responseArea.getX() + i, map(mags[i]));
+    }
+
+    //draw a background border around the graph
+    g.setColour(Colours::orange);
+    g.drawRoundedRectangle(responseArea.toFloat(), 4.0f, 1.0f);
+
+    //draw the path
+    g.setColour(Colours::white);
+    g.strokePath(responseCurve, PathStrokeType(2.0f));
 }
 
 void AudioPluginAudioProcessorEditor::resized()
